@@ -1,0 +1,31 @@
+package auth.security;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+public class SimpleHasher implements PasswordHasher {
+	
+	public String hash(String rawPassword) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] encodedHash = digest.digest(
+					rawPassword.getBytes(StandardCharsets.UTF_8));
+			return bytesToHex(encodedHash);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("Hashing algorithm not available.", e);
+		}
+	}
+	
+	public boolean matches(String rawPassword, String hashedPassword) {
+		return hash(rawPassword).equals(hashedPassword);
+	}
+	
+	private String bytesToHex(byte[] hash) {
+		StringBuilder hexString = new StringBuilder(2 * hash.length);
+		for (byte b : hash ) {
+			hexString.append(String.format("%02x", b));
+		}
+		return hexString.toString();
+	}
+}
