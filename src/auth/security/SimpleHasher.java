@@ -6,9 +6,17 @@ import java.security.NoSuchAlgorithmException;
 
 public class SimpleHasher implements PasswordHasher {
 	
+	/**
+	 * TEMPORARY IMPLEMENTATION - SHA-256 hashing
+	 * TODO: Replace with BCrypt (salted, slow hashing)
+	 * 
+	 * DESIGN NOTE: This class can be swapped with BCryptHasher without 
+	 * modifying UserService due to PasswordHasher interface.
+	 */
+	
 	public String hash(String rawPassword) {
 		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			MessageDigest digest = MessageDigest.getInstance("SHA-256"); // replace w/ BCrypt -__-
 			byte[] encodedHash = digest.digest(
 					rawPassword.getBytes(StandardCharsets.UTF_8));
 			return bytesToHex(encodedHash);
