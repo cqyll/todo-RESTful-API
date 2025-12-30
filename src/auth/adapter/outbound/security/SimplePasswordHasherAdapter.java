@@ -1,10 +1,13 @@
-package auth.security;
+package auth.adapter.outbound.security;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class SimpleHasher implements PasswordHasher {
+import auth.application.port.outbound.PasswordHasherPort;
+
+public class SimplePasswordHasherAdapter implements 
+	PasswordHasherPort {
 	
 	/**
 	 * TEMPORARY IMPLEMENTATION - SHA-256 hashing

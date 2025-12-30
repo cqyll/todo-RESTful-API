@@ -1,21 +1,21 @@
-package auth.token.impl;
+package auth.adapter.outbound.security;
 
 import java.util.UUID;
 
-import auth.token.TokenProvider;
+import auth.application.port.outbound.TokenProviderPort;
 
-public class FakeTokenProvider implements TokenProvider {
-	
+public class FakeTokenProviderAdapter implements TokenProviderPort {
+
 	@Override
 	public String createToken(UUID userId) {
 		return "TOKEN-" + userId.toString();
 	}
-	
+
 	@Override
 	public boolean validateToken(String token) {
 		return token != null && token.startsWith("TOKEN-");
 	}
-	
+
 	@Override
 	public UUID extractUserId(String token) {
 		if (!validateToken(token)) {
