@@ -1,3 +1,8 @@
 bin/
 *.class
 .settings/
+/target/
+.classpath
+.project
+.settings
+
