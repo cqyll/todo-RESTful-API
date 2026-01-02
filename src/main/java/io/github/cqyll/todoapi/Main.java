@@ -41,10 +41,13 @@ public class Main {
         System.out.println(userRepository.getUsersRepo().toString());
         
         System.out.println("Attempting to re-add user2...");
-        String third = userRegistrationService.register(user2);
+        try {
+        	String third = userRegistrationService.register(user2);
+        } catch(IllegalArgumentException e) {
+        	System.out.println("ERROR: " +  e.getMessage());
+        }
+        
 	}
 	
 
 }
-	
-
