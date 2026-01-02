@@ -18,37 +18,41 @@ public class UserRegistrationService implements UserRegistrationUseCase {
         this.passwordHasher = passwordHasher;
     }
     
+    
     @Override
-    public String register(RegisterRequest request) {
-        validate(request);
-        
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered");
-        }
-        
-        String hash = passwordHasher.hash(request.getPassword());
-        Password password = Password.fromHash(hash);
-        
-        // create user entity obj with pw VO
-        User user = User.createWithPassword(
-            request.getEmail(),
-            request.getName(),
-            password
-        );
-        
-        userRepository.save(user);
-        
-        return user.getId().toString();
+    public String register(String email, String name, String rawPassword) {
+    	
+    	validateRegistrationPreconditions(email, rawPassword);
+    	 
+    	String hash = passwordHasher.hash(rawPassword);
+    	Password password = Password.fromHash(hash);
+    	
+    	User user = User.createWithPassword(email, name, password);
+    	
+    	userRepository.save(user);
+    	
+    	return user.getId().toString();
     }
     
-    private void validate(RegisterRequest request) {
-        if (request == null) throw new IllegalArgumentException("Request cannot be null");
-        if (isBlank(request.getName())) throw new IllegalArgumentException("Name is required");
-        if (isBlank(request.getEmail())) throw new IllegalArgumentException("Email is required");
-        if (isBlank(request.getPassword())) throw new IllegalArgumentException("Password is required");
+
+    private void validateRegistrationPreconditions(String email, String rawPassword) {
+    	validateEmailUniqueness(email);
+    	validatePasswordPolicy(rawPassword);
+    } 
+    
+    // validation helpers
+    
+    private void validateEmailUniqueness(String email) {
+    	if (userRepository.existsByEmail(email)) {
+    		throw new IllegalArgumentException("Email already registered");
+    	}
     }
     
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
+    private void validatePasswordPolicy(String rawPassword) {
+    	if (rawPassword.length() < 8) {
+    		throw new IllegalArgumentException("Password must be atleast 8 characters long.");
+    	}
     }
+    
+    
 }
