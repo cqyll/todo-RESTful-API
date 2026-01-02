@@ -85,7 +85,7 @@ public class User {
 	}
 
 	Password getPassword() {
-		return password; //pkg-private
+		return password;
 	}
 
 	public boolean isActive() {
