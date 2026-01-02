@@ -4,5 +4,5 @@ bin/
 /target/
 .classpath
 .project
-.settings
+*.bak
 
