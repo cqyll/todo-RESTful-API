@@ -73,12 +73,12 @@ public class UserController implements HttpHandler {
 		
 	}
 	
-	private void sendResponse(HttpExchange exchange, int status, String body) 
+	private void sendResponse(HttpExchange exchange, int status, Object body) 
 			throws IOException {
 		
-		byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+		byte[] bytes = mapper.writeValueAsBytes(body);
 		
-		exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
+		exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
 		exchange.sendResponseHeaders(status, bytes.length);
 		
 		try (OutputStream os = exchange.getResponseBody()) {
