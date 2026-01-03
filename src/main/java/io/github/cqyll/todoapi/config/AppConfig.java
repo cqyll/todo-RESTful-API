@@ -36,7 +36,7 @@ public class AppConfig {
 		TokenProviderPort tokenProvider = new FakeTokenProviderAdapter();
 
 		// created services for each use case
-		userRegistrationService = new UserRegistrationService(userRepository, passwordHasher);
+		userRegistrationService = new UserRegistrationService(userRepository, passwordHasher, tokenProvider);
 		// userAuthenticationService = new UserAuthenticationService(
 		//    userRepository, passwordHasher, tokenProvider);
 
