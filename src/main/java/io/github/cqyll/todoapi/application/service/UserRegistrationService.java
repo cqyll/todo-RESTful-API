@@ -3,6 +3,7 @@ package io.github.cqyll.todoapi.application.service;
 import io.github.cqyll.todoapi.application.port.inbound.UserRegistrationUseCase;
 import io.github.cqyll.todoapi.application.port.outbound.UserRepositoryPort;
 import io.github.cqyll.todoapi.application.port.outbound.PasswordHasherPort;
+import io.github.cqyll.todoapi.application.port.outbound.TokenProviderPort;
 import io.github.cqyll.todoapi.domain.User;
 import io.github.cqyll.todoapi.domain.Password;
 import io.github.cqyll.todoapi.dto.RegisterRequest;
@@ -10,12 +11,15 @@ import io.github.cqyll.todoapi.dto.RegisterRequest;
 public class UserRegistrationService implements UserRegistrationUseCase {
     private final UserRepositoryPort userRepository;
     private final PasswordHasherPort passwordHasher;
+    private final TokenProviderPort tokenProvider;
     
     public UserRegistrationService(
             UserRepositoryPort userRepository,
-            PasswordHasherPort passwordHasher) {
+            PasswordHasherPort passwordHasher,
+            TokenProviderPort tokenProvider) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
+        this.tokenProvider = tokenProvider;
     }
     
     
@@ -31,7 +35,7 @@ public class UserRegistrationService implements UserRegistrationUseCase {
     	
     	userRepository.save(user);
     	
-    	return user.getId().toString();
+    	return this.tokenProvider.createToken(user.getId());
     }
     
 
