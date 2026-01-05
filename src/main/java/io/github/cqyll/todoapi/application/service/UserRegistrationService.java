@@ -9,54 +9,54 @@ import io.github.cqyll.todoapi.domain.Password;
 import io.github.cqyll.todoapi.dto.RegisterRequest;
 
 public class UserRegistrationService implements UserRegistrationUseCase {
-    private final UserRepositoryPort userRepository;
-    private final PasswordHasherPort passwordHasher;
-    private final TokenProviderPort tokenProvider;
-    
-    public UserRegistrationService(
-            UserRepositoryPort userRepository,
-            PasswordHasherPort passwordHasher,
-            TokenProviderPort tokenProvider) {
-        this.userRepository = userRepository;
-        this.passwordHasher = passwordHasher;
-        this.tokenProvider = tokenProvider;
-    }
-    
-    
-    @Override
-    public String register(String email, String name, String rawPassword) {
-    	
-    	validateRegistrationPreconditions(email, rawPassword);
-    	 
-    	String hash = passwordHasher.hash(rawPassword);
-    	Password password = Password.fromHash(hash);
-    	
-    	User user = User.createWithPassword(email, name, password);
-    	
-    	userRepository.save(user);
-    	
-    	return this.tokenProvider.createToken(user.getId());
-    }
-    
+	private final UserRepositoryPort userRepository;
+	private final PasswordHasherPort passwordHasher;
+	private final TokenProviderPort tokenProvider;
 
-    private void validateRegistrationPreconditions(String email, String rawPassword) {
-    	validateEmailUniqueness(email);
-    	validatePasswordPolicy(rawPassword);
-    } 
-    
-    // validation helpers
-    
-    private void validateEmailUniqueness(String email) {
-    	if (userRepository.existsByEmail(email)) {
-    		throw new IllegalArgumentException("Email already registered");
-    	}
-    }
-    
-    private void validatePasswordPolicy(String rawPassword) {
-    	if (rawPassword.length() < 8) {
-    		throw new IllegalArgumentException("Password must be atleast 8 characters long.");
-    	}
-    }
-    
-    
+	public UserRegistrationService(
+			UserRepositoryPort userRepository,
+			PasswordHasherPort passwordHasher,
+			TokenProviderPort tokenProvider) {
+		this.userRepository = userRepository;
+		this.passwordHasher = passwordHasher;
+		this.tokenProvider = tokenProvider;
+	}
+
+
+	@Override
+	public String register(String email, String name, String rawPassword) {
+
+		validateRegistrationPreconditions(email, rawPassword);
+
+		String hash = passwordHasher.hash(rawPassword);
+		Password password = Password.fromHash(hash);
+
+		User user = User.createWithPassword(email, name, password);
+
+		userRepository.save(user);
+
+		return this.tokenProvider.createToken(user.getId());
+	}
+
+
+	private void validateRegistrationPreconditions(String email, String rawPassword) {
+		validateEmailUniqueness(email);
+		validatePasswordPolicy(rawPassword);
+	} 
+
+	// validation helpers
+
+	private void validateEmailUniqueness(String email) {
+		if (userRepository.existsByEmail(email)) {
+			throw new IllegalArgumentException("Email already registered");
+		}
+	}
+
+	private void validatePasswordPolicy(String rawPassword) {
+		if (rawPassword.length() < 8) {
+			throw new IllegalArgumentException("Password must be atleast 8 characters long.");
+		}
+	}
+
+
 }

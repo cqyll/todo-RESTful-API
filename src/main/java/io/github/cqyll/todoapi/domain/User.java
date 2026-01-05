@@ -38,6 +38,8 @@ public class User {
 	public static User createWithPassword(String email, String name, Password password) {
 		User user = new User(UUID.randomUUID(), name, email);
 		user.password = password;
+		
+		//handle email verification?
 
 		return user;
 	}
