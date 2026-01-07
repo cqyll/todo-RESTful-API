@@ -25,63 +25,95 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		ensureNotRoot();
-		
-//		runDomainTests();
-//		runServiceTests();
-		
-		runRegistrationHttpTest();
-		
+	    AppConfig appConfig = new AppConfig();
+	    HttpServer server = appConfig.createHttpServer();
+	    server.start();
+
+	    System.out.println("Server started on http://localhost:8080");
+
+	    runRegistrationHttpTest();
+	    runLoginHttpTest();
+
+	    server.stop(0);
 	}
+
+	
+	private static void runLoginHttpTest() throws Exception {
+
+	    URL url = new URL("http://localhost:8080/login");
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+	    connection.setRequestMethod("POST");
+	    connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+	    connection.setDoOutput(true);
+
+	    String json = """
+	            {
+	                "email": "john@doe.com",
+	                "password": "password"
+	            }
+	            """;
+
+	    try (OutputStream os = connection.getOutputStream()) {
+	        os.write(json.getBytes(StandardCharsets.UTF_8));
+	    }
+
+	    int status = connection.getResponseCode();
+	    String responseBody = readAll(
+	            status < 400 ? connection.getInputStream()
+	                         : connection.getErrorStream()
+	    );
+
+	    if (status != 200) {
+	        throw new RuntimeException("Expected HTTP 200 OK");
+	    }
+
+	    if (!responseBody.contains("TOKEN-")) {
+	        throw new RuntimeException("Expected token in login response");
+	    }
+
+	    System.out.println("Login HTTP test passed");
+	}
+
 	
 	private static void runRegistrationHttpTest() throws Exception {
-		
-		AppConfig appConfig = new AppConfig();
-		HttpServer server = appConfig.createHttpServer();
-		server.start();
-		
-		System.out.println("Server started on http://localhost:8080");
-		
-		URL url = new URL("http://localhost:8080/register");
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-		connection.setDoOutput(true);
-		
-		
-		String json = """
-				{
-					"name": "John Doe",
-					"email": "john@doe.com",
-					"password": "password"
-				}
-				""";
-		
-		try (OutputStream os = connection.getOutputStream()) {
-			os.write(json.getBytes(StandardCharsets.UTF_8));
-		}
-		
-		int status = connection.getResponseCode();
-		
-		InputStream responseStream = status < 400 ? connection.getInputStream(): connection.getErrorStream();
-		String responseBody = readAll(responseStream);
-		
-		
-		System.out.println("HTTP Status: " + status);
-		System.out.println("Response Body: " + responseBody);
-		
-		if (status != 201) {
-			throw new RuntimeException("Expected HTTP 201 Created");
-		}
-		
-		if (!responseBody.contains("TOKEN-")) {
-			throw new RuntimeException("Expected token in response");
-		}
-		
-		System.out.println("Registration HTTP test passed");
-		
-		server.stop(0);
+
+	    URL url = new URL("http://localhost:8080/register");
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+	    connection.setRequestMethod("POST");
+	    connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+	    connection.setDoOutput(true);
+
+	    String json = """
+	            {
+	                "name": "John Doe",
+	                "email": "john@doe.com",
+	                "password": "password"
+	            }
+	            """;
+
+	    try (OutputStream os = connection.getOutputStream()) {
+	        os.write(json.getBytes(StandardCharsets.UTF_8));
+	    }
+
+	    int status = connection.getResponseCode();
+	    String responseBody = readAll(
+	            status < 400 ? connection.getInputStream()
+	                         : connection.getErrorStream()
+	    );
+
+	    if (status != 201) {
+	        throw new RuntimeException("Expected HTTP 201 Created");
+	    }
+
+	    if (!responseBody.contains("TOKEN-")) {
+	        throw new RuntimeException("Expected token in response");
+	    }
+
+	    System.out.println("Registration HTTP test passed");
 	}
+
 	
 	private static String readAll(InputStream is) throws IOException {
 		try (BufferedReader br = new BufferedReader(
