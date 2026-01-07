@@ -16,8 +16,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import com.sun.net.httpserver.HttpContext;
-
 
 public class AppConfig {
 	private UserRegistrationService userRegistrationService;
@@ -37,12 +35,12 @@ public class AppConfig {
 
 		// created services for each use case
 		userRegistrationService = new UserRegistrationService(userRepository, passwordHasher, tokenProvider);
-		// userAuthenticationService = new UserAuthenticationService(
-		//    userRepository, passwordHasher, tokenProvider);
+		userAuthenticationService = new UserAuthenticationService(
+				userRepository, passwordHasher, tokenProvider);
 
 		// created corresponding controllers
 		userController = new UserController(userRegistrationService);
-		// authController = new AuthController(userAuthenticationService);
+		authController = new AuthController(userAuthenticationService);
 
 	}
 
@@ -51,8 +49,9 @@ public class AppConfig {
 			// creating socket address via hostname string may resolve to IPv6
 			HttpServer server = HttpServer.create(
 					new InetSocketAddress("localhost", 8080), 0);
-
-			server.createContext("/register", userController);
+			
+			// register HTTP context and attaching handlers
+			registerContexts(server);
 
 			return server;
 		} catch(IOException e) {
@@ -62,4 +61,9 @@ public class AppConfig {
 
 	public UserController getUserController() { return userController; }
 	public AuthController getAuthController() { return authController; }
+	
+	private void registerContexts(HttpServer server) {
+		server.createContext("/register", userController);
+		server.createContext("/login", authController);
+	}
 }
