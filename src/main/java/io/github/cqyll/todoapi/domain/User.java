@@ -25,7 +25,7 @@ public class User {
 
 	private User(UUID id, String name, String email) {
 		validateEmail(email);
-		
+
 		this.id = id;
 		this.name = name != null ? name.trim() : "";
 		this.email = email.trim().toLowerCase();
@@ -38,7 +38,7 @@ public class User {
 	public static User createWithPassword(String email, String name, Password password) {
 		User user = new User(UUID.randomUUID(), name, email);
 		user.password = password;
-		
+
 		//handle email verification?
 
 		return user;
@@ -51,12 +51,12 @@ public class User {
 
 		return user;
 	}
-	
+
 	public boolean verifyPassword(String rawPassword, PasswordHasherPort hasher) {
 		if (password == null) {
 			return false; // not possible for OAuth users
 		}
-		return password.matches(rawPassword, hasher);
+		return password.correspondsTo(rawPassword, hasher);
 	}
 
 
@@ -99,13 +99,13 @@ public class User {
 	}
 
 	@Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        User user = (User) obj;
-        return id.equals(user.id); // equal by id
-    }
-	
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
+		User user = (User) obj;
+		return id.equals(user.id); // equal by id
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
