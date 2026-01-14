@@ -13,16 +13,16 @@ import io.github.cqyll.todoapi.application.port.outbound.PasswordHasherPort;
 
 public class Password {
 	private final String hash;
-	
+
 	private Password(String hash) {
 		validate(hash);
 		this.hash = hash;
 	}
-	
+
 	public static Password fromHash(String hash) {
 		return new Password(hash);
 	}
-	
+
 	private void validate(String hash) {
 		if (hash == null || hash.isBlank()) {
 			throw new IllegalArgumentException("Password hash cannot be empty.");
@@ -31,11 +31,11 @@ public class Password {
 			throw new IllegalArgumentException("Invalid password hash format");
 		}
 	}
-	
-	public boolean matches(String rawPassword, PasswordHasherPort hasher) {
+
+	public boolean correspondsTo(String rawPassword, PasswordHasherPort hasher) {
 		return hasher.matches(rawPassword, this.hash);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -43,14 +43,14 @@ public class Password {
 		Password password = (Password) obj;
 		return hash.equals(password.hash);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(hash);
 	}
-	
+
 	public String getHash() {
 		return hash; // safe getter (immutable object)
 	}
-	
+
 }

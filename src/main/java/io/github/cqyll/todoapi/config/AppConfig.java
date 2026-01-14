@@ -1,91 +1,56 @@
 package io.github.cqyll.todoapi.config;
 
+import com.sun.net.httpserver.HttpServer;
+import io.github.cqyll.todoapi.adapter.inbound.web.LoginController;
+import io.github.cqyll.todoapi.adapter.inbound.web.OAuthTokenController;
 import io.github.cqyll.todoapi.adapter.inbound.web.UserController;
-import io.github.cqyll.todoapi.adapter.inbound.web.AuthController;
-import io.github.cqyll.todoapi.application.service.UserRegistrationService;
-import io.github.cqyll.todoapi.application.service.LoginService;
-import io.github.cqyll.todoapi.application.service.BasicAuthenticationStrategy;
-import io.github.cqyll.todoapi.application.service.OAuthAuthenticationStrategy;
-import io.github.cqyll.todoapi.application.service.AuthenticationStrategy;
-import io.github.cqyll.todoapi.application.port.outbound.UserRepositoryPort;
-import io.github.cqyll.todoapi.application.port.inbound.LoginUseCase;
-import io.github.cqyll.todoapi.application.port.inbound.UserRegistrationUseCase;
+import io.github.cqyll.todoapi.adapter.outbound.persistence.InMemoryUserAdapter;
+import io.github.cqyll.todoapi.adapter.outbound.security.FakeTokenProviderAdapter;
+import io.github.cqyll.todoapi.adapter.outbound.security.SimplePasswordHasherAdapter;
 import io.github.cqyll.todoapi.application.port.outbound.PasswordHasherPort;
 import io.github.cqyll.todoapi.application.port.outbound.TokenProviderPort;
-import io.github.cqyll.todoapi.adapter.outbound.persistence.InMemoryUserAdapter;
-import io.github.cqyll.todoapi.adapter.outbound.security.SimplePasswordHasherAdapter;
-import io.github.cqyll.todoapi.adapter.outbound.security.FakeTokenProviderAdapter;
-
-import com.sun.net.httpserver.HttpServer;
+import io.github.cqyll.todoapi.application.port.outbound.UserRepositoryPort;
+import io.github.cqyll.todoapi.application.service.BasicCredentialsAuthenticator;
+import io.github.cqyll.todoapi.application.service.BasicLoginService;
+import io.github.cqyll.todoapi.application.service.OAuthTokenService;
+import io.github.cqyll.todoapi.application.service.UserRegistrationService;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 
 public class AppConfig {
-    private UserRegistrationUseCase userRegistrationService;
-    private LoginUseCase loginService;
     private UserController userController;
-    private AuthController authController;
+    private LoginController loginController;
+    private OAuthTokenController oauthTokenController;
 
-    public AppConfig() {
-        initialize();
-    }
+    public AppConfig() { initialize(); }
 
     private void initialize() {
-        // Create adapters
-        UserRepositoryPort userRepository = new InMemoryUserAdapter();
-        PasswordHasherPort passwordHasher = new SimplePasswordHasherAdapter();
+        UserRepositoryPort userRepo = new InMemoryUserAdapter();
+        PasswordHasherPort hasher = new SimplePasswordHasherAdapter();
         TokenProviderPort tokenProvider = new FakeTokenProviderAdapter();
 
-        // Create authentication strategies
-        BasicAuthenticationStrategy basicStrategy = new BasicAuthenticationStrategy(
-            userRepository, passwordHasher
-        );
-        
-        OAuthAuthenticationStrategy oauthStrategy = new OAuthAuthenticationStrategy(
-            basicStrategy
-        );
-        
-        // Create strategy map
-        Map<String, AuthenticationStrategy> strategies = new HashMap<>();
-        strategies.put("basic", basicStrategy);
-        strategies.put("oauth", oauthStrategy);
+        UserRegistrationService reg = new UserRegistrationService(userRepo, hasher, tokenProvider);
+        userController = new UserController(reg);
 
-        // Create services for each use case
-        userRegistrationService = new UserRegistrationService(
-            userRepository, passwordHasher, tokenProvider
-        );
-        
-        loginService = new LoginService(
-            strategies, tokenProvider
-        );
+        BasicCredentialsAuthenticator basicAuth = new BasicCredentialsAuthenticator(userRepo, hasher);
 
-        // Create corresponding controllers
-        userController = new UserController(userRegistrationService);
-        authController = new AuthController(loginService); // Single auth controller for all auth flows
+        loginController = new LoginController(new BasicLoginService(basicAuth, tokenProvider));
+
+        oauthTokenController = new OAuthTokenController(
+                new OAuthTokenService(basicAuth, tokenProvider, "todo-web", "todo-secret")
+        );
     }
 
     public HttpServer createHttpServer() {
         try {
-            HttpServer server = HttpServer.create(
-                    new InetSocketAddress("localhost", 8080), 0);
-            
-            registerContexts(server);
+            HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+            server.createContext("/register", userController);
+            server.createContext("/login", loginController);
+            server.createContext("/oauth/token", oauthTokenController);
             return server;
-        } catch(IOException e) {
-            throw new RuntimeException("Failed to create HTTP server", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public UserController getUserController() { return userController; }
-    public AuthController getAuthController() { return authController; }
-    
-    private void registerContexts(HttpServer server) {
-        server.createContext("/register", userController);
-        server.createContext("/login", authController); // Basic auth endpoint
-        server.createContext("/oauth/token", authController); // OAuth token endpoint
-        // Both endpoints use the same AuthController - it detects content type
     }
 }
