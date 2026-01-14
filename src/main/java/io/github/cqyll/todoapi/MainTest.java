@@ -157,13 +157,14 @@ public class MainTest {
                 "username", username,
                 "password", password
         ));
-
+        // create http request
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/oauth/token"))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(form))
                 .build();
 
+        // use HTTP proxy from java.net to send request and save the response
         HttpResponse<String> r = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
         printResponse(r);
 
@@ -228,16 +229,18 @@ public class MainTest {
     }
 
     private static void negativeUnsupportedGrantType(String username, String password) throws Exception {
-        String form = form(Map.of(
+        // build form body using helper
+    	String form = form(Map.of(
                 "grant_type", "client_credentials",
                 "username", username,
                 "password", password
         ));
-
+    	// build Authorization header
         String basic = Base64.getEncoder().encodeToString(
                 (CLIENT_ID + ":" + CLIENT_SECRET).getBytes(StandardCharsets.UTF_8)
         );
 
+        // create HTTP request
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE + "/oauth/token"))
                 .header("Authorization", "Basic " + basic)

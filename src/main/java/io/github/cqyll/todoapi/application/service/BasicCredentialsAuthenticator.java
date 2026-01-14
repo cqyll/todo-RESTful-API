@@ -25,7 +25,6 @@ public class BasicCredentialsAuthenticator {
         if (!user.verifyPassword(rawPassword, hasher)) {
             throw new IllegalArgumentException("Invalid credentials");
         }
-
         return user;
     }
 }

@@ -38,7 +38,7 @@ public class OAuthTokenRequest {
         }
     }
 	
-	
+	// unused method, validation handled by service -- jan 14
     public void validate() {
         // Basic validation - client_id is required for all OAuth flows
         if (clientId == null || clientId.isBlank()) {

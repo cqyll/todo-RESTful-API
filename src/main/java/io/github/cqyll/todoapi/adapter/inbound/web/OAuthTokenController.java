@@ -24,6 +24,7 @@ public class OAuthTokenController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange ex) throws IOException {
+    	// http method check
         if (!"POST".equalsIgnoreCase(ex.getRequestMethod())) {
             ex.getResponseHeaders().set("Allow", "POST");
             ex.sendResponseHeaders(405, -1);
@@ -32,13 +33,18 @@ public class OAuthTokenController implements HttpHandler {
 
         try {
             // RFC 6749 token endpoint: form parameters. We do NOT branch on Content-Type.
+        	
+        	// read request body and parse form
             String raw = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             Map<String, String> form = parseForm(raw);
 
             // Client authentication: prefer Authorization header (client_secret_basic),
             // fallback to form (client_secret_post). If both provided, header wins.
+            
+            // parse client auth and return relevant field as `ClientAuth` object
             ClientAuth clientAuth = parseClientAuth(ex, form);
 
+            // build DTO
             OAuthTokenRequest req = new OAuthTokenRequest();
             req.setGrantType(form.get("grant_type"));
             req.setUsername(form.get("username"));
@@ -50,6 +56,7 @@ public class OAuthTokenController implements HttpHandler {
             req.setClientId(clientAuth.clientId);
             req.setClientSecret(clientAuth.clientSecret);
 
+            // call service
             Map<String, Object> resp = useCase.token(req);
 
             // Token responses must be JSON and should not be cached (RFC 6749).

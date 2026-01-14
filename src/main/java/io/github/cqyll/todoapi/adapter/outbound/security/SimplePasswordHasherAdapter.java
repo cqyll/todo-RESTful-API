@@ -12,9 +12,6 @@ public class SimplePasswordHasherAdapter implements
 	/**
 	 * TEMPORARY IMPLEMENTATION - SHA-256 hashing
 	 * TODO: Replace with BCrypt (salted, slow hashing)
-	 * 
-	 * DESIGN NOTE: This class can be swapped with BCryptHasher without 
-	 * modifying UserService due to PasswordHasher interface.
 	 */
 	
 	public String hash(String rawPassword) {

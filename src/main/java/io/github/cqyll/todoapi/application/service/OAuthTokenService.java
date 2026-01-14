@@ -12,7 +12,7 @@ public class OAuthTokenService implements OAuthTokenUseCase {
     private final BasicCredentialsAuthenticator basicAuth;
     private final TokenProviderPort tokenProvider;
 
-    // Replace with ClientRepositoryPort later (recommended).
+    // Replace with ClientRepositoryPort later
     private final String expectedClientId;
     private final String expectedClientSecret;
 
@@ -35,18 +35,22 @@ public class OAuthTokenService implements OAuthTokenUseCase {
             throw OAuthError.invalidRequest("grant_type is required");
         }
 
-        // Validate client (token endpoint requires confidential client auth in many deployments).
+        // Validate client (token endpoint may require confidential client auth in many deployments).
         if (isBlank(req.getClientId())) {
             throw OAuthError.invalidClient("client authentication failed");
         }
+        
+        // hard-coded clientId & clientSecret for demo purposes
+        // Constants set in `MainTest.java` must match `AppConfig.java` constructor args
         if (!expectedClientId.equals(req.getClientId())
                 || !expectedClientSecret.equals(nullToEmpty(req.getClientSecret()))) {
             throw OAuthError.invalidClient("client authentication failed");
         }
 
+        // route by grant type
         String grant = req.getGrantType();
         if (!"password".equals(grant)) {
-            // since you currently implement only password
+            // currently only support password grants
             throw OAuthError.unsupportedGrantType("grant_type not supported");
         }
 
