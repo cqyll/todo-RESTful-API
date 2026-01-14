@@ -3,7 +3,7 @@ package io.github.cqyll.todoapi.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OAuthTokenRequest extends AuthRequest {
+public class OAuthTokenRequest {
 	private String grantType;
 	private String clientId;
 	private String clientSecret;
@@ -15,10 +15,9 @@ public class OAuthTokenRequest extends AuthRequest {
 	private String redirectUri;
 	
 	public OAuthTokenRequest() {
-		super("oauth");
 	}
 	
-	@Override
+	
 	public Map<String, String> toCredentials() {
         Map<String, String> creds = new HashMap<>();
         putIfNotNull(creds, "grant_type", grantType);
@@ -39,7 +38,7 @@ public class OAuthTokenRequest extends AuthRequest {
         }
     }
 	
-	@Override
+	
     public void validate() {
         // Basic validation - client_id is required for all OAuth flows
         if (clientId == null || clientId.isBlank()) {
