@@ -10,7 +10,7 @@ import io.github.cqyll.todoapi.adapter.outbound.security.SimplePasswordHasherAda
 import io.github.cqyll.todoapi.application.port.outbound.PasswordHasherPort;
 import io.github.cqyll.todoapi.application.port.outbound.TokenProviderPort;
 import io.github.cqyll.todoapi.application.port.outbound.UserRepositoryPort;
-import io.github.cqyll.todoapi.application.service.BasicAuthenticationStrategy;
+import io.github.cqyll.todoapi.application.service.BasicCredentialsAuthenticator;
 import io.github.cqyll.todoapi.application.service.BasicLoginService;
 import io.github.cqyll.todoapi.application.service.OAuthTokenService;
 import io.github.cqyll.todoapi.application.service.UserRegistrationService;
@@ -33,7 +33,7 @@ public class AppConfig {
         UserRegistrationService reg = new UserRegistrationService(userRepo, hasher, tokenProvider);
         userController = new UserController(reg);
 
-        BasicAuthenticationStrategy basicAuth = new BasicAuthenticationStrategy(userRepo, hasher);
+        BasicCredentialsAuthenticator basicAuth = new BasicCredentialsAuthenticator(userRepo, hasher);
 
         loginController = new LoginController(new BasicLoginService(basicAuth, tokenProvider));
 
