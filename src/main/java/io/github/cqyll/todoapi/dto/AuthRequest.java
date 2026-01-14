@@ -5,11 +5,15 @@ import java.util.Map;
 public abstract class AuthRequest {
 	private final String strategy;
 	
-	public abstract Map<String, String> toCredentials();
-	public abstract void validate();
-	
-	protected AuthRequest(String strat) {
-		this.strategy = strat;
+	protected AuthRequest(String strategy) {
+		this.strategy = strategy;
 	}
-	public String getStrategy() { return this.strategy; }
+	
+	public String getStrategy() {
+		return this.strategy;
+	}
+	
+	public abstract Map<String, String> toCredentials();
+	
+	public abstract void validate(); //check req fields present
 }
