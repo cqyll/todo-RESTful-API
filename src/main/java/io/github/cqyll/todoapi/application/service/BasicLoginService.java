@@ -5,10 +5,10 @@ import io.github.cqyll.todoapi.application.port.outbound.TokenProviderPort;
 import io.github.cqyll.todoapi.domain.User;
 
 public class BasicLoginService implements BasicLoginUseCase {
-    private final BasicAuthenticationStrategy basicAuth;
+    private final BasicCredentialsAuthenticator basicAuth;
     private final TokenProviderPort tokenProvider;
 
-    public BasicLoginService(BasicAuthenticationStrategy basicAuth, TokenProviderPort tokenProvider) {
+    public BasicLoginService(BasicCredentialsAuthenticator basicAuth, TokenProviderPort tokenProvider) {
         this.basicAuth = basicAuth;
         this.tokenProvider = tokenProvider;
     }

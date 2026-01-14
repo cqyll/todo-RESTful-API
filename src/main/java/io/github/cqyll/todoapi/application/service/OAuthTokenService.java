@@ -9,7 +9,7 @@ import io.github.cqyll.todoapi.adapter.inbound.web.OAuthError;
 import java.util.Map;
 
 public class OAuthTokenService implements OAuthTokenUseCase {
-    private final BasicAuthenticationStrategy basicAuth;
+    private final BasicCredentialsAuthenticator basicAuth;
     private final TokenProviderPort tokenProvider;
 
     // Replace with ClientRepositoryPort later (recommended).
@@ -17,7 +17,7 @@ public class OAuthTokenService implements OAuthTokenUseCase {
     private final String expectedClientSecret;
 
     public OAuthTokenService(
-            BasicAuthenticationStrategy basicAuth,
+            BasicCredentialsAuthenticator basicAuth,
             TokenProviderPort tokenProvider,
             String expectedClientId,
             String expectedClientSecret
