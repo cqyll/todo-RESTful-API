@@ -24,18 +24,11 @@ public class UserController implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange exchange) throws IOException {
-
-		// only allow POST request
 		if (!"POST".equals(exchange.getRequestMethod())) {
-			// request not supported; no response body length
-			exchange.sendResponseHeaders(405, -1); // method not allowed
+			exchange.sendResponseHeaders(405, -1);
 			return;
 		}
-
-
-		// parse JSON using jackson
-
-		RegisterRequest request; // dto
+		RegisterRequest request;
 
 		try (InputStream is = exchange.getRequestBody()) {
 			request = mapper.readValue(is, RegisterRequest.class);
@@ -44,44 +37,29 @@ public class UserController implements HttpHandler {
 			return;
 		}
 
-		/*
-		 * transport-level validation
-		 * will have to refactor on OAuth integration -- password
-		 */
-
+		// transport level validation
 		if (request.getEmail() == null || request.getName() == null || request.getPassword() == null) {
 			sendResponse(exchange, 400, "Missing fields"); // bad request
 			return;
 		}
-
-		// call service
 
 		try {
 			String issueValidToken = registrationService.register(
 					request.getEmail(),
 					request.getName(),
 					request.getPassword());
-
-
-			// success
-			sendResponse(exchange, 201, issueValidToken); // created
+			sendResponse(exchange, 201, issueValidToken);
 		} catch (IllegalArgumentException e) {
-			// conflict -- thrown by service validation methods
 			sendResponse(exchange, 409, e.getMessage()); 
 		}
-
-
-
 	}
 
 	private void sendResponse(HttpExchange exchange, int status, Object body) 
 			throws IOException {
-
 		byte[] bytes = mapper.writeValueAsBytes(body);
 
 		exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
 		exchange.sendResponseHeaders(status, bytes.length);
-
 		try (OutputStream os = exchange.getResponseBody()) {
 			os.write(bytes);
 		}

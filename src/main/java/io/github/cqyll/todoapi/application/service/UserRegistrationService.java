@@ -22,7 +22,6 @@ public class UserRegistrationService implements UserRegistrationUseCase {
 		this.tokenProvider = tokenProvider;
 	}
 
-
 	@Override
 	public String register(String email, String name, String rawPassword) {
 
@@ -38,13 +37,10 @@ public class UserRegistrationService implements UserRegistrationUseCase {
 		return this.tokenProvider.createToken(user.getId());
 	}
 
-
 	private void validateRegistrationPreconditions(String email, String rawPassword) {
 		validateEmailUniqueness(email);
 		validatePasswordPolicy(rawPassword);
 	} 
-
-	// validation helpers
 
 	private void validateEmailUniqueness(String email) {
 		if (userRepository.existsByEmail(email)) {

@@ -18,6 +18,7 @@ public class OAuthTokenRequest {
 	}
 	
 	
+<<<<<<< HEAD
 	public Map<String, String> toCredentials() {
         Map<String, String> creds = new HashMap<>();
         putIfNotNull(creds, "grant_type", grantType);
@@ -39,6 +40,32 @@ public class OAuthTokenRequest {
     }
 	
 	// unused method, validation handled by service -- jan 14
+=======
+	/**
+	 * Creates an {@code OAuthTokenRequest} from parsed form parameters and client credentials.
+	 * 
+	 * <p>Maps OAuth token request parameter names to DTO fields. Duplicate form parameters are assumed to have already been resolved. </p>
+	 * 
+	 * @param form parsed token request parameters
+	 * @param clientId resolved client identifier
+	 * @param clientSecret resolved client secret
+	 * @return populated request DTO
+	 */
+	public static OAuthTokenRequest from(Map<String, String> form, String clientId, String clientSecret) {
+		OAuthTokenRequest req = new OAuthTokenRequest();
+	    req.setGrantType(form.get("grant_type"));
+	    req.setUsername(form.get("username"));
+	    req.setPassword(form.get("password"));
+	    req.setRefreshToken(form.get("refresh_token"));
+	    req.setCode(form.get("code"));
+	    req.setScope(form.get("scope"));
+	    req.setRedirectUri(form.get("redirect_uri"));
+	    req.setClientId(clientId);
+	    req.setClientSecret(clientSecret);
+	    return req;
+	}
+	
+>>>>>>> 20bec2f (WIP: ongoing OAuth token flow refactor)
     public void validate() {
         // Basic validation - client_id is required for all OAuth flows
         if (clientId == null || clientId.isBlank()) {

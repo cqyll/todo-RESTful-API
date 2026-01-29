@@ -24,10 +24,9 @@ public class MainTest {
 
     private static final String BASE = "http://localhost:8080";
 
-    // Must match your OAuthTokenService config (demo client)
     private static final String CLIENT_ID = "todo-web";
     private static final String CLIENT_SECRET = "todo-secret";
-
+    
     public static void main(String[] args) throws Exception {
         HttpServer server = null;
 
@@ -82,7 +81,7 @@ public class MainTest {
     // -------------------- /register --------------------
 
     private static String register(String email, String name, String password) throws Exception {
-        // Your current UserController expects: email, name, password
+        // current UserController expects: email, name, password
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("email", email);
         payload.put("name", name);
@@ -95,8 +94,7 @@ public class MainTest {
             throw new RuntimeException("Register failed: " + r.body());
         }
 
-        // Your current /register returns a JSON string token: "abc"
-        // If you change it later to {token:"abc"}, this still works.
+        // /register returns a JSON string token: "abc"
         return extractTokenAnyShape(r.body());
     }
 

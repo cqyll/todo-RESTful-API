@@ -136,6 +136,7 @@ public class OAuthTokenController implements HttpHandler {
         String clientSecret = form.get("client_secret");
         return new ClientAuth(clientId, clientSecret);
     }
+    
 
     private static final class ClientAuth {
         final String clientId;

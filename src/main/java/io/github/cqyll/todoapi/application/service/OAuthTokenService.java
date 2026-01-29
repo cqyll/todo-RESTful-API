@@ -69,8 +69,7 @@ public class OAuthTokenService implements OAuthTokenUseCase {
         }
        
         if (!user.isActive()) {
-            // OAuth2 commonly uses invalid_grant for bad user creds / invalid grant usage.
-            throw OAuthError.invalidGrant("invalid resource owner credentials");
+            throw OAuthError.invalidGrant("invalid resource owner credentials"); // invalid_grant for bad user creds / invalid grant usage.
         }
 
         String access = tokenProvider.createToken(user.getId());
